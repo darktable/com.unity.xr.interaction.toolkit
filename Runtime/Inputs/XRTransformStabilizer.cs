@@ -39,8 +39,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Inputs
         }
 
         /// <summary>
-        /// When provided a ray, the stabilizer will calculate the rotation that keeps a ray's endpoint stable. 
-        /// When stabilizing rotation, it uses whatever value is most optimal - either the last rotation (minimizing rotation), 
+        /// When provided a ray, the stabilizer will calculate the rotation that keeps a ray's endpoint stable.
+        /// When stabilizing rotation, it uses whatever value is most optimal - either the last rotation (minimizing rotation),
         /// or the rotation that keeps the endpoint in place.
         /// </summary>
         public IXRRayProvider aimTarget
@@ -143,25 +143,25 @@ namespace UnityEngine.XR.Interaction.Toolkit.Inputs
 
             if (m_AimTarget == null)
             {
-                StabilizeTransform(currentPosition, currentRotation, targetPosition, targetRotation, Time.deltaTime, m_PositionStabilization * localScale, m_AngleStabilization,
+                StabilizeTransform(currentPosition, currentRotation, targetPosition, targetRotation, GetDeltaTime(), m_PositionStabilization * localScale, m_AngleStabilization,
                 out var resultPosition, out var resultRotation);
                 m_ThisTransform.SetPositionAndRotation(resultPosition, resultRotation);
             }
             else
             {
                 // Calculate the stabilized position
-                StabilizePosition(currentPosition, targetPosition, Time.deltaTime, m_PositionStabilization * localScale, out var resultPosition);
+                StabilizePosition(currentPosition, targetPosition, GetDeltaTime(), m_PositionStabilization * localScale, out var resultPosition);
 
                 // Use that to come up with the rotation that would put the endpoint of the ray at it's last position
                 // Stabilize rotation to whatever value is closer - keeping the endpoint stable or the ray itself stable
-                CalculateRotationParams(currentPosition, resultPosition, m_ThisTransform.forward, m_ThisTransform.up, m_AimTarget.rayEndPoint, invScale, m_AngleStabilization, 
+                CalculateRotationParams(currentPosition, resultPosition, m_ThisTransform.forward, m_ThisTransform.up, m_AimTarget.rayEndPoint, invScale, m_AngleStabilization,
                                         out var antiRotation, out var scaleFactor, out var targetAngleScale);
 
-                StabilizeOptimalRotation(currentRotation, targetRotation, antiRotation, Time.deltaTime, m_AngleStabilization, targetAngleScale, scaleFactor, out var resultRotation);
+                StabilizeOptimalRotation(currentRotation, targetRotation, antiRotation, GetDeltaTime(), m_AngleStabilization, targetAngleScale, scaleFactor, out var resultRotation);
                 m_ThisTransform.SetPositionAndRotation(resultPosition, resultRotation);
             }
         }
-        
+
 #if BURST_PRESENT
         [BurstCompile]
 #endif
@@ -189,7 +189,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Inputs
             var positionOffset = targetPos - startPos;
             var positionDistance = math.length(positionOffset);
             var positionLerp = CalculateStabilizedLerp(positionDistance / positionStabilization, deltaTime);
-            
+
             resultPos = math.lerp(startPos, targetPos, positionLerp);
         }
 
@@ -289,6 +289,32 @@ namespace UnityEngine.XR.Interaction.Toolkit.Inputs
             scaleFactor = 1f + math.log(math.max(rayLength * invScale, 1f));
             targetAngleScale = angleStabilization * math.clamp(scaleFactor, 1f, 3f);
         }
+
+        private int m_LastFrame = -1;
+        private float m_LastTime = -1;
+        private float m_DeltaTime = -1;
+
+        private float GetDeltaTime()
+        {
+            if (m_LastTime < 0)
+            {
+                m_LastFrame = Time.frameCount;
+                m_LastTime = Time.realtimeSinceStartup;
+                m_DeltaTime = m_LastTime;
+                return m_DeltaTime;
+            }
+
+            var currentFrame = Time.frameCount;
+            if (m_LastFrame != currentFrame)
+            {
+                var currentTime = Time.realtimeSinceStartup;
+
+                m_LastFrame = currentFrame;
+                m_DeltaTime = currentTime - m_LastTime;
+                m_LastTime = currentTime;
+            }
+
+            return m_DeltaTime;
+        }
     }
 }
-

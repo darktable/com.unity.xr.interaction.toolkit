@@ -652,7 +652,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         public bool enableARRaycasting
         {
             get => m_EnableARRaycasting;
-            set 
+            set
             {
                 m_EnableARRaycasting = value;
 #if AR_FOUNDATION_PRESENT
@@ -691,7 +691,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         TrackableType m_TrackableType = TrackableType.PlaneWithinPolygon;
 
         /// <summary>
-        /// The <see cref="ARTrackable"/> types that will taken into consideration with the performed <see cref="ARRaycast"/>. 
+        /// The <see cref="ARTrackable"/> types that will taken into consideration with the performed <see cref="ARRaycast"/>.
         /// </summary>
         public TrackableType trackableType
         {
@@ -741,7 +741,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
         /// <inheritdoc />
         public float scaleValue { get; protected set; }
-        
+
         /// <summary>
         /// The starting position and direction of any ray casts.
         /// Safe version of <see cref="rayOriginTransform"/>, falls back to this Transform if not set.
@@ -761,7 +761,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         /// <summary>
         /// The closest index of the sample endpoint where a 3D, UI or AR hit occurred.
         /// </summary>
-        int closestAnyHitIndex  
+        int closestAnyHitIndex
         {
             get
             {
@@ -793,7 +793,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 {
                     return m_ARRaycastHitEndpointIndex;
                 }
-               
+
                 return 0;
             }
         }
@@ -821,7 +821,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         int m_RaycastHitsCount;
         readonly RaycastHitComparer m_RaycastHitComparer = new RaycastHitComparer();
 
-#if AR_FOUNDATION_PRESENT 
+#if AR_FOUNDATION_PRESENT
         int m_ARRaycastHitEndpointIndex;
         readonly List<ARRaycastHit> m_ARRaycastHits = new List<ARRaycastHit>();
         int m_ARRaycastHitsCount;
@@ -887,7 +887,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         RaycastResult m_UIRaycastHit;
         bool m_IsUIHitClosest;
         IXRInteractable m_RaycastInteractable;
-#if AR_FOUNDATION_PRESENT 
+#if AR_FOUNDATION_PRESENT
         ARRaycastHit m_ARRaycastHit;
         bool m_IsARHitClosest;
 #endif
@@ -929,7 +929,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
             m_ScreenSpaceController = xrController as XRScreenSpaceController;
             m_IsScreenSpaceController = m_ScreenSpaceController != null;
-            
+
             if (m_IsScreenSpaceController && m_AllowAnchorControl && m_AnchorRotationMode == AnchorRotationMode.RotateOverTime)
             {
                 Debug.LogWarning("Rotate Over Time is not a valid value for Rotation Mode when using XR Screen Space Controller." +
@@ -963,7 +963,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
             if (m_EnableUIInteraction)
                 m_RegisteredUIInteractorCache?.RegisterWithXRUIInputModule();
-            
+
 #if AR_FOUNDATION_PRESENT
             if (m_EnableARRaycasting)
                 FindCreateARRaycastManager();
@@ -1051,7 +1051,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 Gizmos.DrawLine(uiRaycastResult.worldPosition, uiRaycastResult.worldPosition + uiRaycastResult.worldNormal.normalized * length);
             }
 
-#if AR_FOUNDATION_PRESENT 
+#if AR_FOUNDATION_PRESENT
             if (TryGetCurrentARRaycastHit(out var arRaycastHit))
             {
                 // Draw the normal of the surface at the hit point
@@ -1539,7 +1539,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         /// <returns>Returns <see langword="true"/> if a hit occurred, implying the ray cast hit information is valid.
         /// Otherwise, returns <see langword="false"/>.</returns>
         /// <remarks>
-        /// If <see cref="occludeARHitsWith2DObjects"/> or <see cref="occludeARHitsWith3DObjects"/> are set to <see langword="true"/> and a 
+        /// If <see cref="occludeARHitsWith2DObjects"/> or <see cref="occludeARHitsWith3DObjects"/> are set to <see langword="true"/> and a
         /// 2D UI or 3D object are closer, the result will be <see langword="false"/> with the default values for both the <paramref name="raycastHit"/>
         /// and <paramref name="raycastEndpointIndex"/>.
         /// </remarks>
@@ -1640,11 +1640,11 @@ namespace UnityEngine.XR.Interaction.Toolkit
             m_RaycastHit = default;
             m_UIRaycastHit = default;
 
-#if AR_FOUNDATION_PRESENT 
+#if AR_FOUNDATION_PRESENT
             m_ARRaycastHit = default;
             m_IsARHitClosest = default;
 
-#endif            
+#endif
             m_IsUIHitClosest = default;
 
             m_RaycastHitOccurred = false;
@@ -1729,7 +1729,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
         /// </summary>
         void UpdateUIHover()
         {
-            var timeDelta = Time.time - m_LastTimeHoveredUIChanged;
+            var timeDelta = GetTime() - m_LastTimeHoveredUIChanged;
             if (m_IsUIHitClosest && timeDelta > m_HoverTimeToSelect && (timeDelta < (m_HoverTimeToSelect + m_TimeToAutoDeselect) || m_BlockUIAutoDeselect))
                 m_HoverUISelectActive = true;
             else
@@ -1782,7 +1782,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             output = default;
             return false;
         }
-        
+
         static bool TryReadButton(InputAction action)
         {
             return action != null && action.WasPerformedThisFrame();
@@ -1798,7 +1798,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             if (Mathf.Approximately(directionAmount, 0f))
                 return;
 
-            var rotateAngle = directionAmount * (m_RotateSpeed * Time.deltaTime);
+            var rotateAngle = directionAmount * (m_RotateSpeed * GetDeltaTime());
 
             if (m_AnchorRotateReferenceFrame != null)
                 anchor.Rotate(m_AnchorRotateReferenceFrame.up, rotateAngle, Space.World);
@@ -1835,7 +1835,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
             GetLineOriginAndDirection(rayOrigin, out var lineOrigin, out var lineDirection);
 
-            var resultingPosition = anchor.position + lineDirection * (directionAmount * m_TranslateSpeed * Time.deltaTime);
+            var resultingPosition = anchor.position + lineDirection * (directionAmount * m_TranslateSpeed * GetDeltaTime());
 
             // Check the delta between the origin position and the calculated position.
             // Clamp so it doesn't go further back than the origin position.
@@ -1871,12 +1871,12 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 if (nearestObject != currentNearestValidTarget && !hasSelection)
                 {
                     currentNearestValidTarget = nearestObject;
-                    m_LastTimeHoveredObjectChanged = Time.time;
+                    m_LastTimeHoveredObjectChanged = GetTime();
                     m_PassedHoverTimeToSelect = false;
                 }
                 else if (!m_PassedHoverTimeToSelect && nearestObject != null)
                 {
-                    var progressToHoverSelect = Mathf.Clamp01((Time.time - m_LastTimeHoveredObjectChanged) / GetHoverTimeToSelect(currentNearestValidTarget));
+                    var progressToHoverSelect = Mathf.Clamp01((GetTime() - m_LastTimeHoveredObjectChanged) / GetHoverTimeToSelect(currentNearestValidTarget));
 
                     // If we have a selection and we're processing hover to select, don't allow hover to pass
                     // Selection likely came from non-hover method and we don't want to auto-deselect
@@ -1887,7 +1887,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 // If we have a selection and interactable is set to auto deselect, process the select time
                 if (m_AutoDeselect && hasSelection && !m_PassedTimeToAutoDeselect)
                 {
-                    var progressToDeselect = Mathf.Clamp01((Time.time - m_LastTimeAutoSelected) / GetTimeToAutoDeselect(currentNearestValidTarget));
+                    var progressToDeselect = Mathf.Clamp01((GetTime() - m_LastTimeAutoSelected) / GetTimeToAutoDeselect(currentNearestValidTarget));
                     if (progressToDeselect >= 1f)
                         m_PassedTimeToAutoDeselect = true;
                 }
@@ -2194,7 +2194,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 var toPoint = m_SamplePoints[i].position;
 
                 CheckCollidersBetweenPoints(fromPoint, toPoint, origin);
-                if (m_RaycastHitsCount > 0 && !has3DHit) 
+                if (m_RaycastHitsCount > 0 && !has3DHit)
                 {
                     m_RaycastHitEndpointIndex = i;
                     has3DHit = true;
@@ -2209,7 +2209,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 {
                     break;
                 }
-#else 
+#else
                 if (has3DHit)
                 {
                     break;
@@ -2296,7 +2296,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             var optimalHits = m_LocalPhysicsScene.Raycast(origin, direction, s_SpherecastScratch, obstructionDistance, layerMask, queryTriggerInteraction);
             if (optimalHits > 0)
             {
-                for (var i = 0; i < optimalHits; ++i) 
+                for (var i = 0; i < optimalHits; ++i)
                 {
                     var hitInfo = s_SpherecastScratch[i];
                     if (hitInfo.distance > obstructionDistance)
@@ -2354,7 +2354,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
                     // Adjust distance by distance from ray center for default sorting
                     BurstPhysicsUtils.GetConecastOffset(origin, hit.point, direction, out var hitToRayDist);
-                    
+
                     // We penalize these off-center hits by a meter + whatever horizontal offset they have
                     hit.distance += currentOffset + 1f + (hitToRayDist);
                     results[hitCounter] = hit;
@@ -2456,7 +2456,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
         /// <inheritdoc />
         protected override bool isUISelectActive
-        { 
+        {
             get
             {
                 if (m_HoverToSelect && m_HoverUISelectActive)
@@ -2465,7 +2465,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
                 return base.isUISelectActive;
             }
         }
-        
+
 
         /// <inheritdoc />
         public override bool CanHover(IXRHoverInteractable interactable)
@@ -2509,7 +2509,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             // Update when selecting via hover to select
             if (m_AutoDeselect && m_PassedHoverTimeToSelect)
             {
-                m_LastTimeAutoSelected = Time.time;
+                m_LastTimeAutoSelected = GetTime();
                 m_PassedTimeToAutoDeselect = false;
             }
 
@@ -2526,7 +2526,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             m_PassedHoverTimeToSelect = false;
 
             // Reset the auto select/deselect properties to allow this Interactor to select again after select exit
-            m_LastTimeHoveredObjectChanged = Time.time;
+            m_LastTimeHoveredObjectChanged = GetTime();
             m_PassedTimeToAutoDeselect = false;
 
             if (!hasSelection)
@@ -2557,7 +2557,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
 
                 if (selectable != null)
                 {
-                    m_LastTimeHoveredUIChanged = Time.time;
+                    m_LastTimeHoveredUIChanged = GetTime();
                     m_BlockUIAutoDeselect = m_LastUIObject.GetComponent<Slider>() != null;
                 }
                 else
@@ -2584,7 +2584,7 @@ namespace UnityEngine.XR.Interaction.Toolkit
             if (m_LastUIObject != selectable)
             {
                 m_LastUIObject = null;
-                m_LastTimeHoveredUIChanged = Time.time;
+                m_LastTimeHoveredUIChanged = GetTime();
                 m_BlockUIAutoDeselect = false;
                 m_HoverUISelectActive = false;
             }
@@ -2641,6 +2641,38 @@ namespace UnityEngine.XR.Interaction.Toolkit
             /// the parametric parameter <i>t</i> of the curve at the sample (with range [0, 1]).
             /// </summary>
             public float parameter { get; set; }
+        }
+
+        private float GetTime()
+        {
+            return Time.realtimeSinceStartup;
+        }
+
+        private int m_LastFrame = -1;
+        private float m_LastTime = -1;
+        private float m_DeltaTime = -1;
+
+        private float GetDeltaTime()
+        {
+            if (m_LastTime < 0)
+            {
+                m_LastFrame = Time.frameCount;
+                m_LastTime = Time.realtimeSinceStartup;
+                m_DeltaTime = m_LastTime;
+                return m_DeltaTime;
+            }
+
+            var currentFrame = Time.frameCount;
+            if (m_LastFrame != currentFrame)
+            {
+                var currentTime = Time.realtimeSinceStartup;
+
+                m_LastFrame = currentFrame;
+                m_DeltaTime = currentTime - m_LastTime;
+                m_LastTime = currentTime;
+            }
+
+            return m_DeltaTime;
         }
     }
 }
