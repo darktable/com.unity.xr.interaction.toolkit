@@ -91,8 +91,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Interactors.Casters
 
         readonly UnityObjectReferenceCache<IXRRayProvider, Object> m_AimTargetObjectRef = new UnityObjectReferenceCache<IXRRayProvider, Object>();
 
-        bool m_InitializedStabilizationOrigin;
-        Transform m_StabilizationAnchor;
+        protected bool m_InitializedStabilizationOrigin;
+        protected Transform m_StabilizationAnchor;
         float m_LastStabilizationUpdateTime;
 
         /// <summary>

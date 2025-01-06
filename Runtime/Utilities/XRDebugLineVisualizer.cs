@@ -8,7 +8,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Utilities
     /// </summary>
     [AddComponentMenu("")] // Hide in menu
     [HelpURL(XRHelpURLConstants.k_XRDebugLineVisualizer)]
-    internal class XRDebugLineVisualizer : MonoBehaviour
+    public class XRDebugLineVisualizer : MonoBehaviour
     {
         /// <summary>
         /// Represents a debug line with its properties.
