@@ -25,6 +25,14 @@ namespace UnityEngine.XR.Interaction.Toolkit.Interactors.Casters
         [Tooltip("Source of origin and direction used when updating sample points.")]
         Transform m_CastOrigin;
 
+        [SerializeField]
+        private Transform xrOriginTransform;
+
+        public void SetXROriginTransform(Transform xrot)
+        {
+            xrOriginTransform = xrot;
+        }
+
         /// <inheritdoc />
         public Transform castOrigin
         {
@@ -187,11 +195,16 @@ namespace UnityEngine.XR.Interaction.Toolkit.Interactors.Casters
 
             if (m_StabilizationAnchor == null)
             {
-                if (!ComponentLocatorUtility<XROrigin>.TryFindComponent(out var xrOrigin))
+                if (xrOriginTransform == null)
                 {
-                    Debug.LogError($"Failed to find XROrigin component in scene. Cannot stabilize cast origin for {GetType().Name}.", this);
-                    m_EnableStabilization = false;
-                    return false;
+                    if (!ComponentLocatorUtility<XROrigin>.TryFindComponent(out var xrOrigin))
+                    {
+                        Debug.LogError($"Failed to find XROrigin component in scene. Cannot stabilize cast origin for {GetType().Name}.", this);
+                        m_EnableStabilization = false;
+                        return false;
+                    }
+
+                    xrOriginTransform = xrOrigin.Origin.transform;
                 }
 
                 // Capture hand name
@@ -200,7 +213,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Interactors.Casters
                     handName = interactor.handedness.ToString();
 
                 m_StabilizationAnchor = new GameObject($"[{handName} {GetType().Name}] Stabilization Cast Origin").transform;
-                m_StabilizationAnchor.SetParent(xrOrigin.Origin.transform, false);
+                m_StabilizationAnchor.SetParent(xrOriginTransform, false);
                 m_StabilizationAnchor.SetLocalPose(Pose.identity);
                 m_InitializedStabilizationOrigin = true;
             }
